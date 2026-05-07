@@ -6,6 +6,9 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "mineflayer": "^4.20.1"
+    "mineflayer": "latest"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }
