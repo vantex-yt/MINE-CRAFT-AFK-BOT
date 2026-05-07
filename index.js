@@ -1,74 +1,46 @@
 const mineflayer = require('mineflayer')
 
-const bot = mineflayer.createBot({
-  host: 'VANTEX_YT.aternos.me',
-  port: 20052,
-  username: 'VANTEX_bot',
-  version: '1.21.1'
-})
+function createBot() {
+  const bot = mineflayer.createBot({
+    host: 'VANTEX_YT.aternos.me',
+    port: 20052,
+    username: '§cVANTEX_bot',
+    version: '1.21.1'
+  })
 
-bot.on('spawn', () => {
-  console.log('VANTEX_bot joined server 🔥')
+  bot.on('spawn', () => {
+    console.log('Bot joined server!')
 
-  bot.chat('VANTEX_bot joined 😈')
+    setInterval(() => {
+      const yaw = Math.random() * Math.PI * 2
+      bot.look(yaw, 0, true)
 
-  setInterval(() => {
+      const actions = ['forward', 'back', 'left', 'right']
 
-    const yaw = Math.random() * Math.PI * 2
-    const pitch = (Math.random() - 0.5) * 0.4
+      const action = actions[Math.floor(Math.random() * actions.length)]
 
-    bot.look(yaw, pitch, true)
+      bot.setControlState(action, true)
 
-    const actions = ['forward', 'back', 'left', 'right']
+      setTimeout(() => {
+        bot.setControlState(action, false)
+      }, 2000)
 
-    const randomAction =
-      actions[Math.floor(Math.random() * actions.length)]
+      const item = bot.nearestEntity(entity => entity.type === 'object')
 
-    bot.setControlState(randomAction, true)
+      if (item) {
+        bot.tossStack(bot.inventory.items()[0])
+      }
 
-    if (Math.random() > 0.5) {
-      bot.setJumpControl(true)
-    }
+    }, 5000)
+  })
 
-    setTimeout(() => {
-      bot.clearControlStates()
-    }, 3000)
+  bot.on('kicked', console.log)
+  bot.on('error', console.log)
 
-  }, 5000)
+  bot.on('end', () => {
+    console.log('Reconnecting...')
+    setTimeout(createBot, 5000)
+  })
+}
 
-})
-
-bot.on('playerCollect', (collector, item) => {
-
-  if (collector !== bot.entity) return
-
-  setTimeout(() => {
-
-    if (bot.inventory.items().length > 0) {
-
-      const randomItem =
-        bot.inventory.items()[0]
-
-      bot.tossStack(randomItem)
-
-    }
-
-  }, 1000)
-
-})
-
-bot.on('chat', (username, message) => {
-
-  if (username === bot.username) return
-
-  if (message === 'hi') {
-    bot.chat('hello 😎')
-  }
-
-})
-
-bot.on('kicked', console.log)
-bot.on('error', console.log)
-bot.on('end', () => {
-  console.log('Bot disconnected!')
-})
+createBot()
