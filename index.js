@@ -1,46 +1,55 @@
 const mineflayer = require('mineflayer')
 
-function createBot() {
+function startBot() {
+
   const bot = mineflayer.createBot({
     host: 'VANTEX_YT.aternos.me',
     port: 20052,
-    username: '§cVANTEX_bot',
+    username: 'VANTEX_bot',
     version: '1.21.1'
   })
 
   bot.on('spawn', () => {
-    console.log('Bot joined server!')
+
+    console.log('Bot joined successfully')
 
     setInterval(() => {
-      const yaw = Math.random() * Math.PI * 2
-      bot.look(yaw, 0, true)
 
-      const actions = ['forward', 'back', 'left', 'right']
-
-      const action = actions[Math.floor(Math.random() * actions.length)]
-
-      bot.setControlState(action, true)
+      bot.setControlState('forward', true)
 
       setTimeout(() => {
-        bot.setControlState(action, false)
-      }, 2000)
+        bot.setControlState('jump', true)
 
-      const item = bot.nearestEntity(entity => entity.type === 'object')
+        setTimeout(() => {
+          bot.setControlState('jump', false)
+        }, 500)
 
-      if (item) {
-        bot.tossStack(bot.inventory.items()[0])
-      }
+      }, 1000)
+
+      setTimeout(() => {
+        bot.setControlState('forward', false)
+      }, 3000)
 
     }, 5000)
-  })
 
-  bot.on('kicked', console.log)
-  bot.on('error', console.log)
+  })
 
   bot.on('end', () => {
-    console.log('Reconnecting...')
-    setTimeout(createBot, 5000)
+    console.log('Disconnected... reconnecting')
+
+    setTimeout(() => {
+      startBot()
+    }, 10000)
   })
+
+  bot.on('kicked', reason => {
+    console.log('Kicked:', reason)
+  })
+
+  bot.on('error', err => {
+    console.log('Error:', err)
+  })
+
 }
 
-createBot()
+startBot()
