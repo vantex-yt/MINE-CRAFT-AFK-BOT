@@ -1,55 +1,65 @@
 const mineflayer = require('mineflayer')
 
+let reconnecting = false
+
 function startBot() {
+  reconnecting = false
 
   const bot = mineflayer.createBot({
     host: '_GALAXY_.aternos.me',
     port: 20052,
-    username: 'GALAGXY',
-    version: '1.21.1'
+    username: 'GALAXY',
+    version: '1.21.1',
+    auth: 'offline'
   })
 
-  bot.on('spawn', () => {
+  let moveInterval = null
 
-    console.log('Bot joined successfully')
+  bot.once('spawn', () => {
+    console.log('✅ Bot joined successfully')
 
-    setInterval(() => {
+    moveInterval = setInterval(() => {
+      if (!bot.entity) return
 
       bot.setControlState('forward', true)
+      bot.setControlState('jump', true)
 
-      setTimeout(() => {
-        bot.setControlState('jump', true)
-
-        setTimeout(() => {
-          bot.setControlState('jump', false)
-        }, 500)
-
-      }, 1000)
+      bot.look(
+        Math.random() * Math.PI * 2,
+        0,
+        true
+      )
 
       setTimeout(() => {
         bot.setControlState('forward', false)
-      }, 3000)
+        bot.setControlState('jump', false)
+      }, 1500)
 
-    }, 5000)
-
+    }, 8000)
   })
 
-  bot.on('end', () => {
-    console.log('Disconnected... reconnecting')
+  function reconnect() {
+    if (reconnecting) return
+    reconnecting = true
+
+    if (moveInterval) clearInterval(moveInterval)
+
+    console.log('🔁 Reconnecting in 10s...')
 
     setTimeout(() => {
       startBot()
     }, 10000)
-  })
+  }
+
+  bot.on('end', reconnect)
 
   bot.on('kicked', reason => {
-    console.log('Kicked:', reason)
+    console.log('⚠️ Kicked:', reason)
   })
 
   bot.on('error', err => {
-    console.log('Error:', err)
+    console.log('⚠️ Error:', err.message)
   })
-
 }
 
 startBot()
