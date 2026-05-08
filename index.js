@@ -3,7 +3,7 @@ const mineflayer = require('mineflayer')
 function startBot() {
 
   const bot = mineflayer.createBot({
-    host: 'VANTEX_YT.aternos.me',
+    host: '_GALAXY_.aternos.me',
     port: 20052,
     username: 'GALAGXY',
     version: '1.21.1'
