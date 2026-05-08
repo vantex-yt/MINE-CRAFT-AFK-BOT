@@ -1,0 +1,95 @@
+header-footer:
+  enabled: true
+  designs:
+    default:
+      header:
+        - "&5&m━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        - "&d&l✦ GALAXY COMMUNITY ✦"
+        - "&fOnline: &d%online%&7/&f%server_max_players%"
+        - "&fPing: &d%ping%ms"
+        - "&5&m━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+      footer:
+        - "&ddiscord.gg/V3JEyraF3V"
+playerlist-objective:
+  enabled: true
+  value: '%ping%'
+  fancy-value: '&d%ping%ms'
+  title: '&5GALAXY'
+  render-type: INTEGER
+  disable-condition: '%world%=disabledworld'
+scoreboard:
+  enabled: true
+  toggle-command: /sb
+  remember-toggle-choice: true
+  hidden-by-default: false
+
+  scoreboards:
+    default:
+      title: "&d&l✦ GALAXY ✦"
+
+      lines:
+        - "&5&m━━━━━━━━━━━━"
+        - "&fPlayer: &d%player%"
+        - "&fRank: &r%group%"
+        - ""
+        - "&fMoney: &a$%vault_eco_balance_formatted%"
+        - "&fKills: &c%statistic_player_kills%"
+        - "&fDeaths: &7%statistic_deaths%"
+        - ""
+        - "&fOnline: &d%online%&7/&f%server_max_players%"
+        - "&fPing: &d%ping%ms"
+        - "&fTime: &d%time%"
+        - ""
+        - "&ddiscord.gg/V3JEyraF3V"
+        - "&5&m━━━━━━━━━━━━"
+prevent-spectator-effect:
+  enabled: false
+debug: false
+use-online-uuid-in-tablist: true
+permission-refresh-interval: 1000
+compensate-for-packetevents-bug: false
+assign-groups-by-permissions: false
+primary-group-finding-list:
+- Owner
+- Admin
+- Helper
+- default
+belowname-objective:
+  fancy-value-default: NPC
+  fancy-value: '&c%health%'
+  enabled: false
+placeholders:
+  register-tab-expansion: false
+  locale: en-US
+global-playerlist:
+  update-latency: false
+  enabled: false
+config-version: 6
+components:
+  minimessage-support: true
+  disable-shadow-for-heads: true
+proxy-support:
+  channel-name-suffix: TAB
+  enabled: true
+bossbar:
+  enabled: false
+layout:
+  enabled: false
+mysql:
+  enabled: false
+per-world-playerlist:
+  enabled: false
+ping-spoof:
+  enabled: false
+scoreboard-teams:
+  enabled: true
+tablist-name-formatting:
+  enabled: false
+  
+  playerlist-objective:
+enabled: true
+value: "%ping%"
+fancy-value: "&d%ping%ms"
+title: "&5GALAXY"
+render-type: INTEGER
