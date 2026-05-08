@@ -5,7 +5,7 @@ function startBot() {
   const bot = mineflayer.createBot({
     host: 'VANTEX_YT.aternos.me',
     port: 20052,
-    username: 'G A L A X Y',
+    username: 'GALAGXY',
     version: '1.21.1'
   })
 
