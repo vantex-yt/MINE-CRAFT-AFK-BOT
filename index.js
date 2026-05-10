@@ -6,7 +6,7 @@ function startBot() {
   reconnecting = false
 
   const bot = mineflayer.createBot({
-    host: '_GALAXY_.aternos.me',
+    host: 'GALAXY_.aternos.me',
     port: 20052,
     username: 'GALAXY',
     version: '1.21.1',
