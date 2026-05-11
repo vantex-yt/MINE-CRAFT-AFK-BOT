@@ -5,11 +5,12 @@ const PORT = 20052
 const USERNAME = 'GALAXY_BOT'
 const PASSWORD = 'galaxy123'
 
-let reconnectTimer = null
 let bot = null
+let reconnectTimer = null
+let loginDone = false
 
 function startBot() {
-  console.log('🚀 Trying to join server...')
+  console.log('🚀 GALAXY_BOT kay7awel ydkhol...')
 
   bot = mineflayer.createBot({
     host: HOST,
@@ -17,45 +18,62 @@ function startBot() {
     username: USERNAME,
     auth: 'offline',
     version: false,
-    connectTimeout: 60000
+    connectTimeout: 60000,
+    checkTimeoutInterval: 60000
   })
 
   bot.once('spawn', () => {
-    console.log('✅ Bot دخل للسيرفر')
+    console.log('✅ GALAXY_BOT dkhel l server')
+    loginDone = false
 
     setTimeout(() => {
+      if (!bot) return
       bot.chat(`/login ${PASSWORD}`)
+      loginDone = true
       console.log('🔐 Login sent')
-    }, 4000)
+    }, 5000)
+  })
+
+  bot.on('message', (msg) => {
+    const text = msg.toString()
+    console.log('📩 Server:', text)
+
+    if (
+      text.toLowerCase().includes('login') &&
+      !loginDone
+    ) {
+      setTimeout(() => {
+        if (!bot) return
+        bot.chat(`/login ${PASSWORD}`)
+        loginDone = true
+        console.log('🔐 Login sent again')
+      }, 3000)
+    }
   })
 
   bot.on('end', () => {
-    console.log('❌ Bot خرج من السيرفر')
+    console.log('❌ Bot khrej mn server')
     reconnect()
   })
 
   bot.on('kicked', (reason) => {
-    console.log('⚠️ Kicked reason:', JSON.stringify(reason))
+    console.log('⚠️ Kicked:', JSON.stringify(reason))
   })
 
   bot.on('error', (err) => {
     console.log('⚠️ Error:', err.message)
-  })
-
-  bot.on('message', (msg) => {
-    console.log('📩 Server:', msg.toString())
   })
 }
 
 function reconnect() {
   if (reconnectTimer) return
 
-  console.log('🔁 غادي يعاود يدخل من بعد 30 ثانية...')
+  console.log('🔁 Ghadi y3awd ydkhol mn b3d 45s...')
 
   reconnectTimer = setTimeout(() => {
     reconnectTimer = null
     startBot()
-  }, 30000)
+  }, 45000)
 }
 
 startBot()
