@@ -1,136 +1,97 @@
 const mineflayer = require('mineflayer')
 
-let bot
+const SERVER_HOST = 'GAALAXY.aternos.me'
+const SERVER_PORT = 20052
+const BOT_NAME = 'GALAXY_BOT'
+const PASSWORD = 'galaxy123'
+
+let bot = null
 let reconnecting = false
-let reconnectDelay = 15000
+let antiAfkInterval = null
 
-function createBot() {
-
+function startBot() {
   console.log('🚀 Starting GALAXY_BOT...')
 
   bot = mineflayer.createBot({
-    host: 'GAALAXY.aternos.me',
-    port: 20052,
-    username: 'GALAXY_BOT',
+    host: SERVER_HOST,
+    port: SERVER_PORT,
+    username: BOT_NAME,
     auth: 'offline',
     version: false,
-    hideErrors: false,
-    checkTimeoutInterval: 60000
+    hideErrors: false
   })
 
-  // ===== JOIN =====
   bot.once('spawn', () => {
-
-    console.log('✅ Bot joined the server')
-
+    console.log('✅ GALAXY_BOT دخل للسيرفر')
     reconnecting = false
 
-    // LOGIN
     setTimeout(() => {
-      bot.chat('/login galaxy123')
-    }, 4000)
+      bot.chat(`/login ${PASSWORD}`)
+      console.log('🔐 Login sent')
+    }, 3000)
 
-    // REGISTER IF NEEDED
     setTimeout(() => {
-      bot.chat('/register galaxy123 galaxy123')
-    }, 7000)
+      bot.chat(`/register ${PASSWORD} ${PASSWORD}`)
+      console.log('📝 Register sent if needed')
+    }, 6000)
 
-    // ===== ANTI AFK =====
-    setInterval(() => {
+    if (antiAfkInterval) clearInterval(antiAfkInterval)
 
-      if (!bot.entity) return
+    antiAfkInterval = setInterval(() => {
+      if (!bot || !bot.entity) return
 
-      // LOOK RANDOM
-      const yaw = bot.entity.yaw + (Math.random() - 0.5)
-      const pitch = bot.entity.pitch + (Math.random() - 0.5)
+      try {
+        const moves = ['forward', 'back', 'left', 'right']
+        const move = moves[Math.floor(Math.random() * moves.length)]
 
-      bot.look(yaw, pitch, true)
+        bot.setControlState(move, true)
+        bot.setControlState('jump', true)
 
-      // JUMP
-      bot.setControlState('jump', true)
+        const yaw = bot.entity.yaw + (Math.random() * 1.5 - 0.75)
+        const pitch = bot.entity.pitch + (Math.random() * 0.5 - 0.25)
 
-      setTimeout(() => {
-        bot.setControlState('jump', false)
-      }, 1200)
+        bot.look(yaw, pitch, true)
+        bot.swingArm('right')
 
-      // WALK RANDOM
-      const moves = ['forward', 'back', 'left', 'right']
+        setTimeout(() => {
+          if (!bot) return
+          bot.setControlState(move, false)
+          bot.setControlState('jump', false)
+        }, 2500)
 
-      const randomMove = moves[Math.floor(Math.random() * moves.length)]
-
-      bot.setControlState(randomMove, true)
-
-      setTimeout(() => {
-        bot.setControlState(randomMove, false)
-      }, 3000)
-
-    }, 25000)
-
-    // ===== CHAT AUTO MESSAGE =====
-    setInterval(() => {
-
-      const messages = [
-        '⚡ GALAXY_BOT ONLINE ⚡',
-        '🔥 BEST SERVER 🔥',
-        '💎 GALAXY SMP 💎',
-        '🚀 NEVER GIVE UP 🚀'
-      ]
-
-      const randomMessage =
-        messages[Math.floor(Math.random() * messages.length)]
-
-      bot.chat(randomMessage)
-
-    }, 300000)
-
-    // ===== RANDOM ACTION =====
-    setInterval(() => {
-
-      if (!bot.entity) return
-
-      bot.swingArm()
-
-    }, 45000)
-
+        console.log('🚶 Anti AFK movement')
+      } catch (err) {
+        console.log('⚠️ Anti AFK error:', err.message)
+      }
+    }, 20000)
   })
 
-  // ===== AUTO RESPAWN =====
-  bot.on('death', () => {
-
-    console.log('☠️ Bot died')
-
-    setTimeout(() => {
-      bot.chat('/spawn')
-    }, 5000)
-
-  })
-
-  // ===== AUTO RECONNECT =====
   function reconnect(reason) {
-
     if (reconnecting) return
-
     reconnecting = true
 
-    console.log(`🔁 Reconnecting because: ${reason}`)
+    console.log('🔁 Bot غادي يعاود يدخل. Reason:', reason)
+
+    if (antiAfkInterval) {
+      clearInterval(antiAfkInterval)
+      antiAfkInterval = null
+    }
 
     try {
-      bot.end()
+      if (bot) bot.removeAllListeners()
     } catch (e) {}
 
     setTimeout(() => {
-      createBot()
-    }, reconnectDelay)
-
+      startBot()
+    }, 15000)
   }
 
-  // ===== EVENTS =====
   bot.on('end', () => {
     reconnect('Disconnected')
   })
 
   bot.on('kicked', reason => {
-    console.log('⚠️ Kicked:', reason)
+    console.log('⚠️ Bot kicked:', JSON.stringify(reason))
     reconnect('Kicked')
   })
 
@@ -138,54 +99,30 @@ function createBot() {
     console.log('⚠️ Error:', err.message)
   })
 
-  // ===== PLAYER JOIN LOGGER =====
-  bot.on('playerJoined', player => {
-
-    if (!player || !player.username) return
-
-    console.log(`👤 ${player.username} joined`)
-
+  bot.on('message', msg => {
+    console.log('📩 Server:', msg.toString())
   })
 
-  // ===== PLAYER LEFT LOGGER =====
-  bot.on('playerLeft', player => {
-
-    if (!player || !player.username) return
-
-    console.log(`❌ ${player.username} left`)
-
+  bot.on('death', () => {
+    console.log('☠️ Bot مات')
+    setTimeout(() => {
+      if (bot) bot.chat('/spawn')
+    }, 4000)
   })
 
-  // ===== AUTO REPLY =====
   bot.on('chat', (username, message) => {
-
     if (username === bot.username) return
 
-    console.log(`💬 ${username}: ${message}`)
+    const msg = message.toLowerCase()
 
-    if (message.includes('hi')) {
-      bot.chat(`👋 Hello ${username}`)
+    if (msg.includes('hi') || msg.includes('hello') || msg.includes('salam')) {
+      bot.chat(`👋 Salam ${username}`)
     }
 
-    if (message.includes('tp')) {
-      bot.chat(`/tpaccept`)
+    if (msg.includes('tp')) {
+      bot.chat('/tpaccept')
     }
-
   })
-
-  // ===== KEEP ALIVE =====
-  setInterval(() => {
-
-    if (bot && bot._client) {
-
-      try {
-        bot._client.write('keep_alive', {})
-      } catch (e) {}
-
-    }
-
-  }, 10000)
-
 }
 
-createBot()
+startBot()
